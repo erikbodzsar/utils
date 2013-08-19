@@ -11,27 +11,37 @@ class Timer {
     start();
   }
 
-  void start() {
-    gettimeofday(&start_, NULL);
+  // Start the timer.
+  inline void start() {
+    gettimeofday(&start_time_, NULL);
   }
 
-  uint64_t stop() {
-    gettimeofday(&end_, NULL);
-    return read();
+  // Returns useconds elapsed since last start (or creation).
+  inline uint64_t read() const {
+    timeval current;
+    gettimeofday(&current, NULL);
+    return difference(start_time_, current);
   };
 
-  uint64_t read() {
-    return end_.tv_usec + end_.tv_sec * 1000000 -
-      start_.tv_usec - start_.tv_sec * 1000000;
-  };
-
-  uint64_t restart() {
-    uint64_t ret = stop();
+  // Restart the timer, and return useconds elapsed since last start.
+  inline uint64_t restart() {
+    timeval old_start = start_time_;
     start();
-    return ret;
+    return difference(old_start, start_time_);
+  }
+
+  // Convert usec to sec.
+  static inline double to_sec(uint64_t t) {
+    return t/1e6;
   }
 
  private:
-  timeval start_, end_;
+  timeval start_time_;
+  inline uint64_t difference(const timeval &t1,
+                             const timeval &t2) const {
+    return (t2.tv_sec-t1.tv_sec)*1000000 +
+        t2.tv_usec - t1.tv_usec;
+  }
 };
+
 #endif

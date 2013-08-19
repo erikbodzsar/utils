@@ -17,8 +17,10 @@ void terminate(int x) {
 int main(int argc, char *argv[]) {
   int err;
   /* Read input */
-  if (argc<2) {
-      fprintf(stderr, "need 1 arg (how many MBs to eat)\n");
+  if (argc < 2) {
+      fprintf(stderr,
+              "Usage: %s size\n"
+              "       to lock size MBs of memory", argv[0]);
       exit(1);
     }
   mem = atoi(argv[1]);
@@ -29,7 +31,9 @@ int main(int argc, char *argv[]) {
   lim.rlim_cur = lim.rlim_max = mem;
   err = setrlimit(RLIMIT_MEMLOCK, &lim);
   if (err) {
-      fprintf(stderr, "Error setting locked memory limit\nMake sure you have root priviliges!\n");
+      fprintf(stderr,
+              "Error setting locked memory limit\n"
+              "Make sure you have root privileges!\n");
       exit(1);
     }
 
@@ -60,6 +64,4 @@ int main(int argc, char *argv[]) {
   /* Wait... */
   while (1)
     sleep(1000);
-
-  exit(1);
 }
